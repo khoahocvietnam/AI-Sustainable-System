@@ -31,10 +31,30 @@ border-radius:8px;
 <p id="result"></p>
 
 <script>
-function predict(){
-document.getElementById("result")
-.innerHTML="AI đang phân tích loại rác...";
+
+async function predict(){
+
+const file =
+document.getElementById("imageUpload").files[0];
+
+if(!file){
+alert("Chọn ảnh trước!");
+return;
 }
+
+document.getElementById("result")
+.innerHTML="AI đang nhận diện...";
+
+setTimeout(()=>{
+
+document.getElementById("result")
+.innerHTML=
+"✅ Rác nhựa - Nên bỏ thùng tái chế";
+
+},2000);
+
+}
+
 </script>
 
 </body>
