@@ -1,1 +1,100 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
+<title>Tư vấn sống xanh</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+body{
+background:#edf6f0;
+font-family:Arial;
+}
+
+.box{
+max-width:750px;
+margin:40px auto;
+background:white;
+padding:30px;
+border-radius:15px;
+box-shadow:0px 5px 20px rgba(0,0,0,0.2);
+}
+
+.result{
+margin-top:20px;
+font-size:18px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h3 class="text-center">💬 AI Tư Vấn Lối Sống Bền Vững</h3>
+
+<label>Bạn đi lại chủ yếu bằng?</label>
+<select id="move" class="form-control">
+<option>Xe máy</option>
+<option>Ô tô</option>
+<option>Xe đạp</option>
+<option>Phương tiện công cộng</option>
+</select>
+
+<br>
+
+<label>Số túi nhựa sử dụng mỗi ngày</label>
+<input id="plastic" type="number" class="form-control">
+
+<br>
+
+<label>Thời gian dùng điều hòa (giờ/ngày)</label>
+<input id="air" type="number" class="form-control">
+
+<br>
+
+<button class="btn btn-success w-100"
+onclick="advisor()">AI Phân Tích</button>
+
+<div id="result" class="result"></div>
+
+</div>
+
+<script>
+
+function advisor(){
+
+let move=document.getElementById("move").value;
+let plastic=Number(document.getElementById("plastic").value);
+let air=Number(document.getElementById("air").value);
+
+let advice="";
+
+if(move==="Ô tô")
+advice+="🚗 Nên giảm sử dụng ô tô, ưu tiên phương tiện công cộng.<br>";
+
+if(move==="Xe máy")
+advice+="🛵 Có thể kết hợp đi bộ hoặc xe đạp cho quãng đường ngắn.<br>";
+
+if(plastic>3)
+advice+="♻️ Bạn đang dùng nhiều túi nhựa, hãy chuyển sang túi tái sử dụng.<br>";
+
+if(air>6)
+advice+="❄️ Giảm thời gian dùng điều hòa để tiết kiệm điện.<br>";
+
+if(advice==="")
+advice="🌍 Bạn đang duy trì lối sống rất bền vững!";
+
+document.getElementById("result").innerHTML=advice;
+
+}
+
+</script>
+
+</body>
+</html>
