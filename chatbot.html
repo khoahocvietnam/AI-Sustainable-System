@@ -1,31 +1,144 @@
-<h2>🌱 Chatbot Sống Xanh</h2>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<input id="msg">
-<button onclick="chat()">Gửi</button>
+<title>Chatbot Sống Xanh</title>
 
-<p id="reply"></p>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+body{
+background:#f0f4f7;
+font-family:Arial;
+}
+
+.chat-container{
+max-width:700px;
+margin:40px auto;
+background:white;
+padding:20px;
+border-radius:15px;
+box-shadow:0px 5px 20px rgba(0,0,0,0.2);
+}
+
+.chat-box{
+height:400px;
+overflow-y:auto;
+border:1px solid #ddd;
+padding:15px;
+border-radius:10px;
+background:#fafafa;
+}
+
+.user{
+text-align:right;
+margin:10px;
+}
+
+.bot{
+text-align:left;
+margin:10px;
+}
+
+.bubble-user{
+display:inline-block;
+background:#0d6efd;
+color:white;
+padding:10px 15px;
+border-radius:15px;
+}
+
+.bubble-bot{
+display:inline-block;
+background:#e9ecef;
+padding:10px 15px;
+border-radius:15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="chat-container">
+
+<h3 class="text-center">🌱 Chatbot Sống Xanh AI</h3>
+
+<div id="chatBox" class="chat-box"></div>
+
+<div class="input-group mt-3">
+<input id="userInput" class="form-control"
+placeholder="Nhập câu hỏi...">
+<button class="btn btn-success"
+onclick="sendMessage()">Gửi</button>
+</div>
+
+</div>
 
 <script>
 
-function chat(){
+function addMessage(message,type){
 
-let msg =
-document.getElementById("msg").value;
+let div=document.createElement("div");
+div.className=type;
 
-let answer="";
+let bubble=document.createElement("div");
+
+bubble.className=
+(type==="user")?
+"bubble-user":"bubble-bot";
+
+bubble.innerText=message;
+
+div.appendChild(bubble);
+
+document.getElementById("chatBox")
+.appendChild(div);
+
+document.getElementById("chatBox")
+.scrollTop=999999;
+}
+
+function aiReply(msg){
+
+msg=msg.toLowerCase();
 
 if(msg.includes("điện"))
-answer="Bạn nên tắt thiết bị khi không sử dụng.";
+return "Bạn nên tắt thiết bị khi không sử dụng để tiết kiệm năng lượng.";
 
-else if(msg.includes("nhựa"))
-answer="Hạn chế túi nilon và dùng vật liệu tái chế.";
+if(msg.includes("nước"))
+return "Hãy sử dụng vòi tiết kiệm và tái sử dụng nước sinh hoạt.";
 
-else
-answer="Hãy sống xanh mỗi ngày 🌍";
+if(msg.includes("nhựa"))
+return "Hạn chế túi nilon và dùng sản phẩm tái chế.";
 
-document.getElementById("reply")
-.innerHTML=answer;
+if(msg.includes("môi trường"))
+return "Trồng cây và giảm rác thải là cách bảo vệ môi trường hiệu quả.";
+
+return "Hãy bắt đầu từ những hành động nhỏ để sống xanh mỗi ngày 🌍";
+}
+
+function sendMessage(){
+
+let input=document.getElementById("userInput");
+let message=input.value;
+
+if(message==="") return;
+
+addMessage(message,"user");
+
+input.value="";
+
+setTimeout(()=>{
+addMessage(aiReply(message),"bot");
+},800);
 
 }
 
 </script>
+
+</body>
+</html>
