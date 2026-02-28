@@ -1,144 +1,856 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoWise AI - Giáo sư Sống Xanh</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<title>Chatbot Sống Xanh</title>
+        :root {
+            --primary: #2D6A4F;
+            --primary-light: #40916C;
+            --primary-dark: #1B4D3E;
+            --secondary: #52B788;
+            --accent: #95D5B2;
+            --background: #F8F9FA;
+            --text: #2D3E3F;
+            --error: #D62828;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
 
-<style>
+        .chat-container {
+            width: 100%;
+            max-width: 1000px;
+            height: 90vh;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-body{
-background:#f0f4f7;
-font-family:Arial;
-}
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 20px 30px;
+            color: white;
+        }
 
-.chat-container{
-max-width:700px;
-margin:40px auto;
-background:white;
-padding:20px;
-border-radius:15px;
-box-shadow:0px 5px 20px rgba(0,0,0,0.2);
-}
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
 
-.chat-box{
-height:400px;
-overflow-y:auto;
-border:1px solid #ddd;
-padding:15px;
-border-radius:10px;
-background:#fafafa;
-}
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
 
-.user{
-text-align:right;
-margin:10px;
-}
+        .api-status {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            font-size: 12px;
+            margin-top: 8px;
+        }
 
-.bot{
-text-align:left;
-margin:10px;
-}
+        .api-status.connected {
+            background: rgba(46, 204, 113, 0.3);
+        }
 
-.bubble-user{
-display:inline-block;
-background:#0d6efd;
-color:white;
-padding:10px 15px;
-border-radius:15px;
-}
+        .api-status.disconnected {
+            background: rgba(231, 76, 60, 0.3);
+        }
 
-.bubble-bot{
-display:inline-block;
-background:#e9ecef;
-padding:10px 15px;
-border-radius:15px;
-}
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background: #F8F9FA;
+        }
 
-</style>
+        .message {
+            margin: 20px 0;
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            justify-content: flex-end;
+        }
+
+        .bot-message {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            line-height: 1.6;
+        }
+
+        .user-message .message-content {
+            background: var(--primary);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message .message-content {
+            background: white;
+            color: var(--text);
+            border-bottom-left-radius: 5px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .message-sender {
+            font-size: 12px;
+            margin-bottom: 5px;
+            opacity: 0.7;
+        }
+
+        .message-time {
+            font-size: 10px;
+            margin-top: 5px;
+            opacity: 0.5;
+            text-align: right;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 20px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+            30% { transform: translateY(-10px); opacity: 1; }
+        }
+
+        .input-area {
+            padding: 20px 30px;
+            background: white;
+            border-top: 2px solid var(--accent);
+            display: flex;
+            gap: 15px;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            background: var(--background);
+            border-radius: 50px;
+            padding: 5px 20px;
+            display: flex;
+            align-items: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--primary);
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            transform: scale(1.1);
+            background: var(--primary-dark);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .suggestions {
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            border-top: 1px solid var(--accent);
+        }
+
+        .suggestion-chip {
+            background: white;
+            border: 2px solid var(--accent);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            color: var(--primary-dark);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .suggestion-chip:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .error-message {
+            background: #FFE5E5;
+            border-left: 4px solid var(--error);
+        }
+
+        .retry-btn {
+            background: var(--error);
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 50px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .debug-info {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+            padding: 5px;
+            border-top: 1px dashed #ddd;
+        }
+
+        @media (max-width: 768px) {
+            .message-content {
+                max-width: 90%;
+            }
+        }
+    </style>
 </head>
-
 <body>
+    <div class="chat-container">
+        <div class="header">
+            <h1>🌱 Giáo sư AI Sống Xanh</h1>
+            <p>Đại học Bách Khoa Hà Nội - Tư vấn mọi vấn đề về môi trường & phát triển bền vững</p>
+            <div class="api-status" id="apiStatus">Đang kiểm tra kết nối...</div>
+        </div>
 
-<div class="chat-container">
+        <div id="chatBox" class="chat-box"></div>
 
-<h3 class="text-center">🌱 Chatbot Sống Xanh AI</h3>
+        <div class="suggestions" id="suggestions">
+            <div class="suggestion-chip" onclick="chatBot.useSuggestion('Làm thế nào để bắt đầu sống xanh?')">🌱 Bắt đầu sống xanh</div>
+            <div class="suggestion-chip" onclick="chatBot.useSuggestion('Cách tiết kiệm điện hiệu quả trong gia đình?')">⚡ Tiết kiệm điện</div>
+            <div class="suggestion-chip" onclick="chatBot.useSuggestion('Phân loại rác thải như thế nào cho đúng?')">🗑️ Phân loại rác</div>
+            <div class="suggestion-chip" onclick="chatBot.useSuggestion('Có nên lắp điện mặt trời không? Chi phí?')">☀️ Điện mặt trời</div>
+            <div class="suggestion-chip" onclick="chatBot.useSuggestion('Ăn uống thế nào để bảo vệ môi trường?')">🥗 Ăn uống xanh</div>
+            <div class="suggestion-chip" onclick="chatBot.useSuggestion('Cách giảm rác thải nhựa hàng ngày?')">🚯 Giảm rác nhựa</div>
+        </div>
 
-<div id="chatBox" class="chat-box"></div>
+        <div class="input-area">
+            <div class="input-wrapper">
+                <i class="fas fa-leaf" style="color: var(--primary);"></i>
+                <input 
+                    type="text" 
+                    id="userInput" 
+                    placeholder="Hỏi bất cứ điều gì về sống xanh..."
+                    maxlength="2000"
+                >
+            </div>
+            <button class="action-btn" onclick="chatBot.send()" id="sendBtn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
 
-<div class="input-group mt-3">
-<input id="userInput" class="form-control"
-placeholder="Nhập câu hỏi...">
-<button class="btn btn-success"
-onclick="sendMessage()">Gửi</button>
-</div>
+    <script>
+        // API Configuration
+        const CONFIG = {
+            API_URL: 'https://round-wave-244f.lenguyenngocthieu55.workers.dev/',
+            TIMEOUT: 15000, // 15 seconds
+            MAX_RETRIES: 2
+        };
 
-</div>
+        // Enhanced local knowledge base - phong phú và đa dạng
+        const LOCAL_RESPONSES = {
+            general: [
+                `Chào bạn! Tôi có thể tư vấn cho bạn về nhiều khía cạnh của sống xanh:
+                
+• 🌱 **Lối sống xanh**: Tiết kiệm năng lượng, giảm rác thải, tái chế
+• 💧 **Bảo vệ môi trường**: Tiết kiệm nước, bảo vệ không khí, trồng cây
+• 🏡 **Gia đình bền vững**: Nhà ở xanh, thực phẩm sạch, tiêu dùng thông minh
+• ♻️ **Kinh tế tuần hoàn**: Tái sử dụng, sửa chữa, chia sẻ
+• 🌍 **Biến đổi khí hậu**: Nguyên nhân, tác động, giải pháp
 
-<script>
+Bạn quan tâm đến vấn đề gì nhất?`,
 
-function addMessage(message,type){
+                `Tôi là chuyên gia về sống xanh và phát triển bền vững. 
+                
+Bạn có thể hỏi tôi về:
+✅ Các giải pháp tiết kiệm năng lượng cho gia đình
+✅ Cách phân loại và tái chế rác thải hiệu quả
+✅ Xu hướng sống xanh mới nhất
+✅ Tác động của biến đổi khí hậu đến Việt Nam
+✅ Kinh nghiệm trồng rau sạch tại nhà
+✅ Và nhiều chủ đề khác...
 
-let div=document.createElement("div");
-div.className=type;
+Hãy cho tôi biết bạn muốn tìm hiểu điều gì?`,
 
-let bubble=document.createElement("div");
+                `Xin chào! Rất vui được trò chuyện cùng bạn về chủ đề sống xanh. 
 
-bubble.className=
-(type==="user")?
-"bubble-user":"bubble-bot";
+Một số chủ đề thú vị bạn có thể khám phá:
+🌿 **Năng lượng tái tạo**: Điện mặt trời, điện gió cho gia đình
+🚲 **Giao thông xanh**: Xe đạp, xe điện, đi bộ
+🛒 **Tiêu dùng bền vững**: Mua sắm thông minh, giảm rác thải
+🏠 **Nhà ở xanh**: Thiết kế, vật liệu, cây xanh
+🥗 **Thực phẩm sạch**: Ăn chay, thực phẩm hữu cơ
 
-bubble.innerText=message;
+Bạn thấy chủ đề nào thú vị?`
+            ],
 
-div.appendChild(bubble);
+            energy: [
+                `**Cách tiết kiệm điện hiệu quả trong gia đình:**
 
-document.getElementById("chatBox")
-.appendChild(div);
+💡 **Chiếu sáng:**
+- Thay đèn LED (tiết kiệm 80% điện)
+- Tận dụng ánh sáng tự nhiên
+- Lắp cảm biến chuyển động ở hành lang
 
-document.getElementById("chatBox")
-.scrollTop=999999;
-}
+❄️ **Điều hòa:**
+- Đặt nhiệt độ 25-26°C (tiết kiệm 10% cho mỗi 1°C)
+- Vệ sinh lưới lọc 2 tuần/lần
+- Dùng quạt kết hợp
 
-function aiReply(msg){
+🧊 **Tủ lạnh:**
+- Để cách tường 10cm
+- Không để thức ăn nóng vào tủ
+- Hạn chế mở tủ thường xuyên
 
-msg=msg.toLowerCase();
+⚡ **Thiết bị khác:**
+- Rút phích cắm khi không dùng
+- Chọn thiết bị inverter
+- Dùng ổ cắm hẹn giờ
 
-if(msg.includes("điện"))
-return "Bạn nên tắt thiết bị khi không sử dụng để tiết kiệm năng lượng.";
+Bạn đã áp dụng được cách nào chưa?`,
 
-if(msg.includes("nước"))
-return "Hãy sử dụng vòi tiết kiệm và tái sử dụng nước sinh hoạt.";
+                `**Điện mặt trời cho gia đình - Những điều cần biết:**
 
-if(msg.includes("nhựa"))
-return "Hạn chế túi nilon và dùng sản phẩm tái chế.";
+☀️ **Lợi ích:**
+- Giảm 70-90% hóa đơn tiền điện
+- Bán điện dư cho EVN (1.943đ/kWh)
+- Tăng giá trị ngôi nhà
+- Bảo vệ môi trường
 
-if(msg.includes("môi trường"))
-return "Trồng cây và giảm rác thải là cách bảo vệ môi trường hiệu quả.";
+💰 **Chi phí tham khảo (2024):**
+- Hệ 3kWp: 45-60 triệu (phù hợp hộ nhỏ)
+- Hệ 5kWp: 75-95 triệu (hộ trung bình)
+- Hệ 10kWp: 140-170 triệu (nhà lớn)
 
-return "Hãy bắt đầu từ những hành động nhỏ để sống xanh mỗi ngày 🌍";
-}
+⏱️ **Thời gian hoàn vốn: 4-7 năm**
 
-function sendMessage(){
+Bạn muốn tư vấn cụ thể cho nhà mình không?`
+            ],
 
-let input=document.getElementById("userInput");
-let message=input.value;
+            waste: [
+                `**Hướng dẫn phân loại rác tại nhà (3 thùng):**
 
-if(message==="") return;
+🗑️ **Thùng xanh - Rác hữu cơ:**
+• Thức ăn thừa, rau củ quả hỏng
+• Lá cây, cỏ, hoa
+• Bã cà phê, trà, vỏ trứng
 
-addMessage(message,"user");
+♻️ **Thùng vàng - Rác tái chế:**
+• Giấy báo, bìa carton
+• Chai nhựa (rửa sạch)
+• Lon nhôm, sắt thép
+• Túi nilon sạch
 
-input.value="";
+⚫ **Thùng đen - Rác còn lại:**
+• Túi nilon bẩn, ống hút
+• Tã, băng vệ sinh
+• Cao su, mút xốp
 
-setTimeout(()=>{
-addMessage(aiReply(message),"bot");
-},800);
+💡 **Mẹo:** Dán hình ảnh minh họa trên thùng để cả nhà dễ nhớ!`,
 
-}
+                `**7 cách giảm rác thải nhựa hàng ngày:**
 
-</script>
+1. 🛍️ **Mang túi vải khi đi chợ**
+2. 🚰 **Dùng bình nước cá nhân thay chai nhựa**
+3. 🥤 **Từ chối ống hút nhựa**
+4. 🥡 **Mang hộp đựng thức ăn khi mua hàng**
+5. 🪥 **Dùng bàn chải tre, ống hút inox**
+6. 🛒 **Chọn sản phẩm bao bì giấy/thủy tinh**
+7. ♻️ **Tái chế sáng tạo: chai nhựa làm chậu cây**
 
+❓ **Bạn đã thực hiện được cách nào?**`
+            ],
+
+            water: [
+                `**10 cách tiết kiệm nước trong gia đình:**
+
+🚿 **Phòng tắm:**
+- Tắm nhanh 5 phút (tiết kiệm 150L/ngày)
+- Khóa vòi khi đánh răng
+- Sửa vòi nước rỉ ngay
+
+🍳 **Nhà bếp:**
+- Rửa rau trong chậu thay vòi chảy
+- Ngâm nồi chảo trước khi rửa
+- Dùng máy rửa chén khi đầy tải
+
+🌿 **Ngoài vườn:**
+- Tưới cây sáng sớm/chiều mát
+- Dùng nước mưa tưới cây
+- Phủ gốc cây giữ ẩm
+
+💰 **Lợi ích:** Gia đình 4 người tiết kiệm 30-50% hóa đơn nước!`
+            ],
+
+            food: [
+                `**Ăn uống bền vững - Tốt cho sức khỏe, tốt cho hành tinh:**
+
+🥗 **Nguyên tắc đĩa ăn xanh:**
+- 50% rau củ quả (2-3 loại/ngày)
+- 25% ngũ cốc nguyên hạt
+- 25% đạm thực vật (đậu, nấm, hạt)
+
+🌱 **Lợi ích của ăn chay:**
+- Giảm 2.5kg CO2/bữa ăn
+- Tiết kiệm 30% chi phí thực phẩm
+- Cải thiện sức khỏe tim mạch
+
+🥑 **Mẹo nhỏ:**
+- Ăn theo mùa, chọn thực phẩm địa phương
+- Hạn chế đồ đóng gói sẵn
+- Tự nấu ăn thay vì mua ngoài`,
+
+                `**Thực phẩm nào thân thiện với môi trường?**
+
+🌍 **Lượng khí thải CO2/kg thực phẩm:**
+• Thịt bò: 60kg - Cao nhất
+• Thịt heo: 7kg
+• Thịt gà: 6kg
+• Cá: 5kg
+• Trứng: 4.5kg
+• Đậu hũ: 2kg
+• Rau củ: 2kg
+• Khoai lang: 1.5kg
+• Gạo lứt: 2.5kg
+
+💡 **Mẹo:** "Meatless Monday" - Ăn chay 1 ngày/tuần giúp giảm 52kg CO2/năm!`
+            ],
+
+            garden: [
+                `**Hướng dẫn làm vườn cho người ở phố:**
+
+🌱 **Cây dễ trồng cho ban công:**
+• Rau muống (20-25 ngày thu hoạch)
+• Xà lách (30-40 ngày)
+• Húng quế (20 ngày)
+• Cà chua bi (60-70 ngày)
+• Ớt (80-90 ngày)
+
+🪴 **Dụng cụ cần:**
+- Chậu có lỗ thoát nước
+- Đất trồng sạch
+- Bình tưới phun sương
+- Phân hữu cơ
+
+💧 **Chăm sóc:**
+- Tưới sáng sớm/chiều mát
+- Bón phân 2 tuần/lần
+- Cắt tỉa lá già
+
+💰 **Chi phí ban đầu chỉ 500k-1.5 triệu!**`
+            ],
+
+            transport: [
+                `**Di chuyển xanh - Lựa chọn thông minh:**
+
+🚲 **Xe đạp:**
+- 0 đồng/km, tốt cho sức khỏe
+- Phù hợp quãng đường <5km
+
+🛵 **Xe máy điện:**
+- 200đ/km (rẻ hơn xăng 70%)
+- Sạc 3.000đ/100km
+
+🚌 **Xe buýt:**
+- 5.000-7.000đ/lượt
+- Giảm 70% khí thải so với xe máy
+
+🚶 **Đi bộ:**
+- Miễn phí, tốt cho sức khỏe
+- Lý tưởng cho quãng đường <2km
+
+📊 **So sánh chi phí 10.000km/năm:**
+- Xe máy xăng: 12 triệu + 2.5 tấn CO2
+- Xe máy điện: 2 triệu + 0.5 tấn CO2
+- Xe đạp: 200.000đ + 0 tấn CO2`
+            ],
+
+            home: [
+                `**10 bước cải tạo nhà thành không gian xanh:**
+
+1. 🌿 **Trồng cây xanh trong nhà** (lưỡi hổ, trầu bà lọc khí)
+2. 💡 **Thay đèn LED** (tiết kiệm 80% điện)
+3. 🚿 **Lắp vòi sen tiết kiệm nước**
+4. 🪟 **Tận dụng ánh sáng tự nhiên**
+5. ♻️ **Phân loại rác tại nguồn**
+6. 🧴 **Dùng sản phẩm tẩy rửa sinh học**
+7. 🪴 **Làm vườn trên ban công**
+8. 🧺 **Sửa chữa đồ cũ thay vì mua mới**
+9. ☀️ **Cân nhắc lắp điện mặt trời**
+10. 📱 **Theo dõi điện nước qua app**
+
+💰 **Bắt đầu từ 5-10 triệu cho các cải tạo cơ bản!**`
+            ],
+
+            climate: [
+                `**Biến đổi khí hậu tại Việt Nam - Thực trạng và giải pháp:**
+
+🌡️ **Tác động:**
+- Nhiệt độ tăng 0.5-1°C trong 50 năm
+- Mực nước biển dâng 2.5-3mm/năm
+- Thiên tai gia tăng (bão, lũ, hạn hán)
+
+🌊 **Khu vực chịu ảnh hưởng nặng:**
+- ĐBSCL: xâm nhập mặn, sạt lở
+- Miền Trung: bão lũ
+- Tây Nguyên: hạn hán
+
+💚 **Hành động của mỗi người:**
+- Giảm 1 tấn CO2/năm (trồng cây, tiết kiệm điện)
+- Sử dụng năng lượng tái tạo
+- Hạn chế rác thải nhựa
+- Trồng và bảo vệ rừng
+
+🌍 **Cùng chung tay vì một Việt Nam xanh!**`
+            ]
+        };
+
+        class EcoWiseBot {
+            constructor() {
+                this.chatBox = document.getElementById('chatBox');
+                this.userInput = document.getElementById('userInput');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.apiStatus = document.getElementById('apiStatus');
+                this.history = [];
+                this.isLoading = false;
+                this.apiAvailable = false;
+                
+                this.init();
+                this.checkAPI();
+            }
+
+            async checkAPI() {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+                    
+                    const response = await fetch(CONFIG.API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            message: 'ping',
+                            test: true 
+                        }),
+                        signal: controller.signal
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    
+                    if (response.ok) {
+                        this.apiAvailable = true;
+                        this.apiStatus.textContent = '🟢 Kết nối AI thành công';
+                        this.apiStatus.className = 'api-status connected';
+                    } else {
+                        throw new Error('API not responding');
+                    }
+                } catch (error) {
+                    this.apiAvailable = false;
+                    this.apiStatus.textContent = '🔴 Đang dùng kiến thức nội bộ (AI offline)';
+                    this.apiStatus.className = 'api-status disconnected';
+                    
+                    // Still show welcome message
+                    this.addMessage(this.getLocalResponse('general'), 'bot');
+                }
+            }
+
+            init() {
+                this.userInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !this.isLoading) {
+                        this.send();
+                    }
+                });
+
+                // Initial message
+                if (!this.apiAvailable) {
+                    this.addMessage(this.getLocalResponse('general'), 'bot');
+                }
+            }
+
+            useSuggestion(text) {
+                this.userInput.value = text;
+                this.send();
+            }
+
+            async send() {
+                const message = this.userInput.value.trim();
+                if (!message || this.isLoading) return;
+
+                this.userInput.value = '';
+                
+                // Add user message
+                this.addMessage(message, 'user');
+                
+                // Add to history
+                this.history.push({ role: 'user', content: message });
+
+                // Try API if available
+                if (this.apiAvailable) {
+                    await this.callAPI(message);
+                } else {
+                    // Use local response
+                    setTimeout(() => {
+                        const response = this.getSmartLocalResponse(message);
+                        this.addMessage(response, 'bot');
+                        this.history.push({ role: 'assistant', content: response });
+                    }, 1000);
+                    
+                    this.showTyping();
+                    setTimeout(() => this.removeTyping(), 800);
+                }
+            }
+
+            async callAPI(message) {
+                this.isLoading = true;
+                this.sendBtn.disabled = true;
+                this.showTyping();
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), CONFIG.TIMEOUT);
+
+                try {
+                    const response = await fetch(CONFIG.API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: message,
+                            history: this.history.slice(-10)
+                        }),
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) throw new Error('API error');
+
+                    const data = await response.json();
+                    
+                    this.removeTyping();
+                    this.addMessage(data.reply, 'bot');
+                    this.history.push({ role: 'assistant', content: data.reply });
+
+                } catch (error) {
+                    clearTimeout(timeoutId);
+                    this.removeTyping();
+                    
+                    // Fallback to local
+                    const localResponse = this.getSmartLocalResponse(message);
+                    this.addMessage(localResponse + '\n\n*Đang dùng kiến thức nội bộ do kết nối chậm*', 'bot');
+                    this.history.push({ role: 'assistant', content: localResponse });
+                    
+                    // Update API status
+                    this.apiAvailable = false;
+                    this.apiStatus.textContent = '🔴 Đang dùng kiến thức nội bộ';
+                    this.apiStatus.className = 'api-status disconnected';
+
+                } finally {
+                    this.isLoading = false;
+                    this.sendBtn.disabled = false;
+                    this.userInput.focus();
+                }
+            }
+
+            getSmartLocalResponse(message) {
+                const lowerMsg = message.toLowerCase();
+                
+                // Phân tích intent từ câu hỏi
+                if (lowerMsg.includes('chào') || lowerMsg.includes('hello') || lowerMsg.includes('hi')) {
+                    return this.getLocalResponse('general');
+                }
+                
+                if (lowerMsg.includes('cảm ơn') || lowerMsg.includes('thank')) {
+                    return 'Cảm ơn bạn! Rất vui được giúp đỡ. Bạn còn thắc mắc gì về sống xanh không? 🌱';
+                }
+                
+                if (lowerMsg.includes('điện') || lowerMsg.includes('năng lượng') || lowerMsg.includes('mặt trời')) {
+                    return this.getLocalResponse('energy');
+                }
+                
+                if (lowerMsg.includes('rác') || lowerMsg.includes('phân loại') || lowerMsg.includes('tái chế') || lowerMsg.includes('nhựa')) {
+                    return this.getLocalResponse('waste');
+                }
+                
+                if (lowerMsg.includes('nước') || lowerMsg.includes('tiết kiệm nước')) {
+                    return this.getLocalResponse('water');
+                }
+                
+                if (lowerMsg.includes('ăn') || lowerMsg.includes('thực phẩm') || lowerMsg.includes('chay')) {
+                    return this.getLocalResponse('food');
+                }
+                
+                if (lowerMsg.includes('vườn') || lowerMsg.includes('trồng') || lowerMsg.includes('cây') || lowerMsg.includes('rau')) {
+                    return this.getLocalResponse('garden');
+                }
+                
+                if (lowerMsg.includes('xe') || lowerMsg.includes('đi lại') || lowerMsg.includes('di chuyển')) {
+                    return this.getLocalResponse('transport');
+                }
+                
+                if (lowerMsg.includes('nhà') || lowerMsg.includes('căn hộ') || lowerMsg.includes('phòng')) {
+                    return this.getLocalResponse('home');
+                }
+                
+                if (lowerMsg.includes('khí hậu') || lowerMsg.includes('nóng lên') || lowerMsg.includes('trái đất')) {
+                    return this.getLocalResponse('climate');
+                }
+                
+                // Default response
+                return this.getLocalResponse('general');
+            }
+
+            getLocalResponse(category) {
+                const responses = LOCAL_RESPONSES[category] || LOCAL_RESPONSES.general;
+                if (Array.isArray(responses)) {
+                    return responses[Math.floor(Math.random() * responses.length)];
+                }
+                return responses;
+            }
+
+            addMessage(text, sender, isError = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'bot-message'}`;
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                if (isError) {
+                    contentDiv.classList.add('error-message');
+                }
+                
+                const senderDiv = document.createElement('div');
+                senderDiv.className = 'message-sender';
+                senderDiv.innerHTML = sender === 'user' ? 
+                    '<i class="fas fa-user"></i> Bạn' : 
+                    '<i class="fas fa-robot"></i> Giáo sư AI';
+                
+                const textDiv = document.createElement('div');
+                textDiv.className = 'message-text';
+                
+                // Format text
+                const formattedText = text
+                    .replace(/\n/g, '<br>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/•/g, '•');
+                
+                const paragraphs = formattedText.split('<br><br>');
+                textDiv.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+                
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = new Date().toLocaleTimeString('vi-VN', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                contentDiv.appendChild(senderDiv);
+                contentDiv.appendChild(textDiv);
+                contentDiv.appendChild(timeDiv);
+                messageDiv.appendChild(contentDiv);
+                
+                this.chatBox.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+
+            showTyping() {
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'message bot-message';
+                typingDiv.id = 'typingIndicator';
+                
+                const indicatorDiv = document.createElement('div');
+                indicatorDiv.className = 'typing-indicator';
+                indicatorDiv.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+                
+                typingDiv.appendChild(indicatorDiv);
+                this.chatBox.appendChild(typingDiv);
+                this.scrollToBottom();
+            }
+
+            removeTyping() {
+                const typing = document.getElementById('typingIndicator');
+                if (typing) typing.remove();
+            }
+
+            scrollToBottom() {
+                this.chatBox.scrollTop = this.chatBox.scrollHeight;
+            }
+        }
+
+        // Initialize chatbot
+        const chatBot = new EcoWiseBot();
+    </script>
 </body>
 </html>
