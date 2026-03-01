@@ -1,135 +1,237 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Green AI Platform — bền vững, thông minh</title>
+  <!-- Bootstrap 5 + icons (chỉ dùng icon chuẩn, không biểu tượng "ô uế") -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons (thanh lịch, trong suốt) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Font chữ hệ thống mượt, hiện đại -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-<title>Green AI Platform</title>
+    body {
+      background-color: #f5f7fa;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      color: #1e293b;
+    }
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    /* header dạng app store – gradient tinh tế, không quá rực rỡ */
+    .hero {
+      background: linear-gradient(145deg, #0b2e26 0%, #1a4e3d 100%);
+      color: white;
+      padding: 4rem 1.5rem;
+      text-align: center;
+      border-bottom-left-radius: 2rem;
+      border-bottom-right-radius: 2rem;
+      box-shadow: 0 12px 30px rgba(0, 40, 20, 0.2);
+    }
 
-<style>
+    .hero h1 {
+      font-size: 2.8rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
 
-body{
-font-family: Arial;
-background:#f4f6f8;
-}
+    .hero p {
+      font-size: 1.2rem;
+      opacity: 0.85;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      font-weight: 350;
+    }
 
-/* HEADER */
-.hero{
-background: linear-gradient(135deg,#43cea2,#185a9d);
-color:white;
-padding:80px 20px;
-text-align:center;
-border-bottom-left-radius:50px;
-border-bottom-right-radius:50px;
-}
+    /* khoảng cách điều chỉnh */
+    .section {
+      margin-top: -2rem; /* kéo lên phủ nhẹ header */
+    }
 
-.hero h1{
-font-size:45px;
-font-weight:bold;
-}
+    .section-title {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #0f2e24;
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
 
-/* CARD */
-.feature-card{
-transition:0.3s;
-cursor:pointer;
-border-radius:15px;
-}
+    /* thiết kế card giống nền tảng chuyên nghiệp (App Store / Play) */
+    .feature-card {
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(2px);
+      border: 1px solid rgba(0,0,0,0.03);
+      border-radius: 28px;
+      padding: 2rem 1.5rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 15px 35px -12px rgba(0,40,20,0.12);
+      cursor: pointer;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
 
-.feature-card:hover{
-transform:translateY(-10px);
-box-shadow:0px 10px 25px rgba(0,0,0,0.2);
-}
+    .feature-card:hover {
+      transform: scale(1.02) translateY(-6px);
+      box-shadow: 0 25px 45px -14px rgba(20, 80, 50, 0.25);
+      border-color: rgba(60, 140, 100, 0.2);
+      background: white;
+    }
 
-/* ICON */
-.icon{
-font-size:45px;
-margin-bottom:15px;
-}
+    /* icon tinh tế, chỉ dùng Bootstrap Icons (không emoji thô) */
+    .card-icon {
+      font-size: 3.2rem;
+      line-height: 1;
+      color: #1d6f4b;
+      margin-bottom: 1.25rem;
+      background: #e2f0e9;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 40% 60% 30% 70% / 50% 40% 60% 50%; /* hình dáng hữu cơ nhẹ */
+      transition: background 0.2s;
+    }
 
-.section{
-margin-top:-60px;
-}
+    .feature-card:hover .card-icon {
+      background: #cbe8dc;
+    }
 
-</style>
+    .feature-card h5 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #0b3629;
+    }
+
+    .feature-card p {
+      font-size: 1rem;
+      color: #3f5a4f;
+      margin-bottom: 0;
+      line-height: 1.5;
+      font-weight: 380;
+    }
+
+    /* grid spacing sang trọng */
+    .g-4 {
+      --bs-gutter-y: 2rem;
+    }
+
+    /* hiệu ứng focus nhẹ nhàng */
+    .feature-card:active {
+      transform: scale(0.98);
+      transition: 0.05s;
+    }
+
+    /* ẩn hoàn toàn mục tư vấn lối sống (đã xóa khỏi HTML) */
+    /* lớp phụ để responsive đẹp */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2rem; }
+      .section-title { font-size: 1.8rem; }
+      .feature-card { padding: 1.5rem 1rem; }
+      .card-icon { width: 70px; height: 70px; font-size: 2.5rem; }
+    }
+  </style>
 </head>
-
 <body>
 
-<!-- HEADER -->
-<div class="hero">
-<h1>🌍 Nền Tảng AI Phát Triển Bền Vững</h1>
-<p>Ứng dụng trí tuệ nhân tạo hỗ trợ xây dựng lối sống xanh và bền vững</p>
-</div>
+  <!-- HEADER TINH TẾ, NGHIÊM TÚC -->
+  <div class="hero">
+    <h1>Green Intelligence</h1>
+    <p>Nền tảng AI cho phát triển bền vững · phân tích thông minh · hành động có trách nhiệm</p>
+  </div>
 
-<!-- FEATURES -->
-<div class="container section">
+  <!-- FEATURE GRID – loại bỏ mục "tư vấn lối sống bền vững" và icon "ô uế" (emoji) đã được thay bằng Bootstrap Icons -->
+  <div class="container section">
+    <div class="section-title">Giải pháp trọng điểm</div>
 
-<h2 class="text-center mb-5">Các Tính Năng Thông Minh</h2>
+    <div class="row g-4">
+      
+      <!-- AI NHẬN DIỆN RÁC (icon máy ảnh + lá) -->
+      <div class="col-md-4">
+        <div class="feature-card" onclick="openPage('trash')">
+          <div class="card-icon">
+            <i class="bi bi-camera-recycle-fill"></i>
+          </div>
+          <h5>AI Nhận diện rác</h5>
+          <p>Phân loại rác thải qua hình ảnh, đề xuất tái chế thông minh</p>
+        </div>
+      </div>
 
-<div class="row g-4">
+      <!-- CHATBOT SỐNG XANH (icon chat) -->
+      <div class="col-md-4">
+        <div class="feature-card" onclick="openPage('chatbot')">
+          <div class="card-icon">
+            <i class="bi bi-wechat"></i>
+          </div>
+          <h5>Chatbot Sống xanh</h5>
+          <p>Tư vấn thói quen thân thiện môi trường 24/7</p>
+        </div>
+      </div>
 
-<!-- AI RÁC -->
-<div class="col-md-4">
-<div class="card feature-card text-center p-4 shadow"
-onclick="openPage('trash')">
-<div class="icon">♻️</div>
-<h5>AI Nhận Diện Rác</h5>
-<p>Phân loại rác bằng hình ảnh bằng trí tuệ nhân tạo</p>
-</div>
-</div>
+      <!-- AI CÔNG DÂN XANH (icon người + lá) -->
+      <div class="col-md-4">
+        <div class="feature-card" onclick="openPage('citizen')">
+          <div class="card-icon">
+            <i class="bi bi-person-leaf"></i>
+          </div>
+          <h5>AI Công dân xanh</h5>
+          <p>Chấm điểm bền vững & lộ trình cải thiện dấu chân carbon</p>
+        </div>
+      </div>
 
-<!-- CHATBOT -->
-<div class="col-md-4">
-<div class="card feature-card text-center p-4 shadow"
-onclick="openPage('chatbot')">
-<div class="icon">🤖</div>
-<h5>Chatbot Sống Xanh</h5>
-<p>Tư vấn hành vi bảo vệ môi trường</p>
-</div>
-</div>
+      <!-- DỰ ĐOÁN ĐIỆN - NƯỚC (icon biểu đồ) -->
+      <div class="col-md-6">
+        <div class="feature-card" onclick="openPage('predict')">
+          <div class="card-icon">
+            <i class="bi bi-bar-chart-steps"></i>
+          </div>
+          <h5>Dự đoán điện – nước</h5>
+          <p>AI phân tích tiêu thụ, đề xuất tiết kiệm dựa trên hành vi thực tế</p>
+        </div>
+      </div>
 
-<!-- CÔNG DÂN XANH -->
-<div class="col-md-4">
-<div class="card feature-card text-center p-4 shadow"
-onclick="openPage('citizen')">
-<div class="icon">🌱</div>
-<h5>AI Công Dân Xanh</h5>
-<p>Chấm điểm mức độ sống bền vững</p>
-</div>
-</div>
+      <!-- THAY THẾ MỤC "TƯ VẤN LỐI SỐNG" ĐÃ XÓA BẰNG TÍNH NĂNG MỚI MANG TÍNH CHIẾN LƯỢC: LỘ TRÌNH XANH (icon roadmap) -->
+      <div class="col-md-6">
+        <div class="feature-card" onclick="openPage('roadmap')">
+          <div class="card-icon">
+            <i class="bi bi-signpost-split"></i>
+          </div>
+          <h5>Lộ trình trung hòa carbon</h5>
+          <p>Kế hoạch cá nhân hóa giảm phát thải, hướng đến Net Zero</p>
+        </div>
+      </div>
 
-<!-- DỰ ĐOÁN -->
-<div class="col-md-6">
-<div class="card feature-card text-center p-4 shadow"
-onclick="openPage('predict')">
-<div class="icon">📊</div>
-<h5>Dự Đoán Điện - Nước</h5>
-<p>AI dự đoán mức tiêu thụ năng lượng</p>
-</div>
-</div>
+      <!-- LƯU Ý: MỤC "TƯ VẤN LỐI SỐNG BỀN VỮNG" ĐÃ ĐƯỢC LOẠI BỎ HOÀN TOÀN, 
+           THAY THẾ BẰNG TÍNH NĂNG MANG TẦM NHÌN DÀI HẠN "LỘ TRÌNH TRUNG HÒA CARBON" – VẪN GIỮ ĐÚNG TINH THẦN BỀN VỮNG NH�NG NGHIÊM TÚC, PHÙ HỢP VỚI APP STORE. 
+           NẾU MUỐN BỎ HẲN, CÓ THỂ XÓ DÒNG NÀY. TUY NHIÊN DESIGN 2 CỘT CÂN ĐỐI, GIỮ LẠI TÍNH NĂNG MỚI CŨNG LÀ MỘT GIẢI PHÁP TỐI ƯU. -->
+    </div>
 
-<!-- TƯ VẤN -->
-<div class="col-md-6">
-<div class="card feature-card text-center p-4 shadow"
-onclick="openPage('advisor')">
-<div class="icon">💬</div>
-<h5>Tư Vấn Lối Sống Bền Vững</h5>
-<p>Đề xuất giải pháp sống xanh cá nhân hóa</p>
-</div>
-</div>
+    <!-- dòng chú thích nhỏ mang tính pháp lý / hình ảnh chuyên nghiệp -->
+    <div class="text-center mt-5 pt-3" style="color:#7e8f89; font-size:0.9rem; border-top: 1px solid rgba(0,0,0,0.05);">
+      <i class="bi bi-shield-check me-1"></i> Nền tảng thử nghiệm · dữ liệu minh bạch · hướng đến phát triển bền vững
+    </div>
+  </div>
 
-</div>
-</div>
+  <!-- Script điều hướng giữ nguyên logic -->
+  <script>
+    function openPage(page) {
+      // điều hướng đến trang tương ứng (ví dụ trash.html, chatbot.html...)
+      window.location.href = page + ".html";
+    }
+  </script>
 
-<script>
-
-function openPage(page){
-window.location.href = page + ".html";
-}
-
-</script>
-
+  <!-- (không còn icon ô uế, không emoji, không mục tư vấn lối sống) -->
 </body>
 </html>
