@@ -119,12 +119,19 @@
         .tag-glass { background: #cce5ff; color: #004085; }
         .tag-paper { background: #d1ecf1; color: #0c5460; }
         .tag-organic { background: #f8d7da; color: #721c24; }
+        
         .error-box {
-            background: #f8d7da;
-            color: #721c24;
+            background: #fff3cd;
+            color: #856404;
             padding: 15px;
             border-radius: 10px;
             margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .error-box.severe {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
         }
     </style>
 </head>
@@ -136,7 +143,6 @@
                 AI Nhận Diện Rác - API Riêng
             </h2>
             
-            <!-- Upload Area -->
             <div class="upload-area" onclick="document.getElementById('imageInput').click()">
                 <i class="fas fa-cloud-upload-alt"></i>
                 <p><strong>Nhấp để chọn ảnh</strong></p>
@@ -145,7 +151,6 @@
             
             <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
             
-            <!-- Preview -->
             <div id="previewContainer" style="display: none;">
                 <div class="text-center">
                     <img id="preview" src="" alt="Preview">
@@ -155,24 +160,20 @@
                 </div>
             </div>
             
-            <!-- Analyze Button -->
             <button class="btn-analyze" id="analyzeBtn" onclick="analyzeWaste()" disabled>
                 <i class="fas fa-robot"></i> Phân Tích Rác
             </button>
             
-            <!-- Loading -->
             <div class="loading" id="loading">
                 <div class="spinner"></div>
                 <p class="text-muted">AI đang phân tích ảnh...</p>
             </div>
             
-            <!-- Results -->
             <div id="results"></div>
         </div>
     </div>
 
     <script>
-        // THAY URL NÀY BẰNG URL WORKER CỦA BẠN
         const API_URL = 'https://ancient-bar-4955.lenguyenngocthieu55.workers.dev';
         
         let selectedFile = null;
@@ -181,7 +182,6 @@
             const file = event.target.files[0];
             if (!file) return;
             
-            // Kiểm tra kích thước (max 10MB)
             if (file.size > 10 * 1024 * 1024) {
                 alert('Ảnh không được quá 10MB');
                 return;
@@ -189,7 +189,6 @@
             
             selectedFile = file;
             
-            // Preview
             const reader = new FileReader();
             reader.onload = (e) => {
                 document.getElementById('preview').src = e.target.result;
@@ -213,20 +212,17 @@
         async function analyzeWaste() {
             if (!selectedFile) return;
             
-            // Hiển thị loading
             document.getElementById('loading').style.display = 'block';
             document.getElementById('analyzeBtn').disabled = true;
             document.getElementById('results').innerHTML = '';
             
             try {
-                // Convert ảnh sang base64
                 const reader = new FileReader();
                 const imageBase64 = await new Promise((resolve) => {
                     reader.onload = (e) => resolve(e.target.result);
                     reader.readAsDataURL(selectedFile);
                 });
                 
-                // Gọi API
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
@@ -237,32 +233,49 @@
                 
                 const data = await response.json();
                 
-                // Ẩn loading
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('analyzeBtn').disabled = false;
                 
-                // Hiển thị kết quả
                 displayResults(data);
                 
             } catch (error) {
                 console.error('Error:', error);
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('analyzeBtn').disabled = false;
+                
+                // Sửa lỗi hiển thị Quota
+                let friendlyMessage = error.message;
+                if (friendlyMessage.includes('Quota') || friendlyMessage.includes('429')) {
+                    friendlyMessage = "Hệ thống AI đang bị quá tải do nhiều người sử dụng. Bạn vui lòng đợi khoảng 15-20 giây rồi ấn phân tích lại nhé! 🌱";
+                } else {
+                    friendlyMessage = "Lỗi kết nối đến máy chủ AI. Vui lòng kiểm tra lại mạng của bạn.";
+                }
+
                 document.getElementById('results').innerHTML = `
-                    <div class="error-box">
+                    <div class="error-box severe">
                         <i class="fas fa-exclamation-triangle"></i>
-                        Lỗi kết nối: ${error.message}
+                        <strong>Có lỗi xảy ra:</strong><br>
+                        ${friendlyMessage}
                     </div>
                 `;
             }
         }
         
         function displayResults(data) {
-            if (data.error) {
+            // Sửa lỗi bắt Quota từ data.reply hoặc data.error
+            if (data.error || (data.reply && data.reply.includes('Quota')) || (data.message && data.message.includes('Quota'))) {
+                let errorText = data.error || data.reply || data.message || "Lỗi không xác định";
+                let friendlyMessage = errorText;
+
+                if (errorText.includes('Quota exceeded') || errorText.includes('429') || errorText.includes('rate-limit')) {
+                    friendlyMessage = "Hệ thống AI đang nhận quá nhiều yêu cầu. Bạn vui lòng đợi khoảng 15-20 giây rồi thử lại nhé! 🌱";
+                }
+
                 document.getElementById('results').innerHTML = `
-                    <div class="error-box">
+                    <div class="error-box severe">
                         <i class="fas fa-exclamation-triangle"></i>
-                        ${data.error}
+                        <strong>Không thể phân tích:</strong><br>
+                        ${friendlyMessage}
                     </div>
                 `;
                 return;
@@ -272,13 +285,13 @@
                 document.getElementById('results').innerHTML = `
                     <div class="error-box">
                         <i class="fas fa-info-circle"></i>
-                        Không phát hiện vật thể nào trong ảnh
+                        <strong>Không nhận diện được rác!</strong><br>
+                        AI không tìm thấy vật thể rõ ràng trong ảnh. Bạn hãy thử chụp lại ở góc sáng hơn và gần hơn nhé.
                     </div>
                 `;
                 return;
             }
             
-            // Summary
             let html = `
                 <div class="alert alert-success">
                     <i class="fas fa-check-circle"></i>
@@ -287,7 +300,6 @@
                 </div>
             `;
             
-            // List objects
             data.objects.forEach(obj => {
                 const confidence = Math.round(obj.confidence * 100);
                 html += `
